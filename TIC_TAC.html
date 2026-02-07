@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tic Tac Toe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: linear-gradient(120deg,#4facfe,#00f2fe);
+      color: white;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 90px);
+      gap: 10px;
+      justify-content: center;
+      margin: 20px;
+    }
+
+    .cell {
+      width: 90px;
+      height: 90px;
+      background: white;
+      color: black;
+      font-size: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    button {
+      padding: 8px 12px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    input {
+      padding: 6px;
+      margin: 5px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    .scoreboard {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Tic Tac Toe</h1>
+
+<div>
+  Player X: <input id="playerX" placeholder="Enter name">
+  Player O: <input id="playerO" placeholder="Enter name">
+  <button onclick="setNames()">Start Game</button>
+</div>
+
+<div class="scoreboard">
+  <span id="scoreX">X: 0</span> |
+  <span id="scoreO">O: 0</span> |
+  <span id="draw">Draw: 0</span>
+</div>
+
+<h3 id="status">Enter names to start</h3>
+
+<div class="board" id="board"></div>
+
+<button onclick="resetBoard()">Reset Board</button>
+<button onclick="restartMatch()">Restart Match</button>
+
+<script>
+let board = document.getElementById("board");
+let statusText = document.getElementById("status");
+
+let playerX = "Player X";
+let playerO = "Player O";
+
+let current = "X";
+let gameActive = false;
+
+let state = ["","","","","","","","",""];
+
+let xScore = 0;
+let oScore = 0;
+let drawScore = 0;
+
+const win = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+function createBoard(){
+  board.innerHTML="";
+  for(let i=0;i<9;i++){
+    let cell=document.createElement("div");
+    cell.classList.add("cell");
+    cell.onclick=()=>move(i);
+    board.appendChild(cell);
+  }
+}
+createBoard();
+
+function setNames(){
+  playerX=document.getElementById("playerX").value || "Player X";
+  playerO=document.getElementById("playerO").value || "Player O";
+  gameActive=true;
+  statusText.textContent=playerX+"'s turn";
+}
+
+function move(i){
+  if(!gameActive || state[i]!="") return;
+
+  state[i]=current;
+  board.children[i].textContent=current;
+
+  if(checkWin()){
+    let winner=current=="X"?playerX:playerO;
+    statusText.textContent=winner+" wins!";
+    current=="X"?xScore++:oScore++;
+    updateScore();
+    gameActive=false;
+    return;
+  }
+
+  if(!state.includes("")){
+    statusText.textContent="Draw!";
+    drawScore++;
+    updateScore();
+    gameActive=false;
+    return;
+  }
+
+  current=current=="X"?"O":"X";
+  statusText.textContent=(current=="X"?playerX:playerO)+"'s turn";
+}
+
+function checkWin(){
+  return win.some(p=>{
+    return p.every(i=>state[i]==current);
+  });
+}
+
+function updateScore(){
+  document.getElementById("scoreX").textContent=playerX+": "+xScore;
+  document.getElementById("scoreO").textContent=playerO+": "+oScore;
+  document.getElementById("draw").textContent="Draw: "+drawScore;
+}
+
+function resetBoard(){
+  state=["","","","","","","","",""];
+  current="X";
+  createBoard();
+  statusText.textContent=playerX+"'s turn";
+  gameActive=true;
+}
+
+function restartMatch(){
+  xScore=0;
+  oScore=0;
+  drawScore=0;
+  updateScore();
+  resetBoard();
+}
+</script>
+
+</body>
+</html>
